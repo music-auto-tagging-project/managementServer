@@ -1,3 +1,4 @@
 pymysql
 requests
 tqdm
+google-cloud-translate

@@ -46,3 +46,9 @@ def save_tag_list_in_db(tag_list,musicid,host,user,db,password):
                 cursor.execute(tag_insert_sql,(tag))
                 cursor.execute(tag_has_music_insert_sql,(tag,musicid,rank+1))
         db.commit()
+
+def is_in_korean(input_s):
+  for c in input_s:
+      if ord('가') <= ord(c) <= ord('힣'):
+          return 1
+  return 0

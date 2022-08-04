@@ -12,6 +12,8 @@ import json
 from utils import get_lyric_by_musicDB,get_all_music_id_list
 from utils import save_tag_list_in_db
 from utils import init_tag_table_in_db
+from utils import is_in_korean
+from google.cloud import translate_v2 as translate
 
 assert os.environ.get("DB_HOST") is not None, "should register DB account in environment variables."
 assert os.environ.get("DB_USER") is not None, "should register DB account in environment variables."
@@ -28,11 +30,16 @@ print("init tag table..")
 init_tag_table_in_db(host,user,db,password)
 print("init tag table finish.")
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./translate-key.json"
+translator=translate.Client()
+
 print("start extraction tag by music id..")
 all_music_id_list = get_all_music_id_list(host,user,db,password)
 tag_dict={}
 for music_id in tqdm(all_music_id_list):
     lyric = get_lyric_by_musicDB(music_id,host,user,db,password)
+    if not is_in_korean(lyric):
+      lyric = translator.translate(lyric,target_language="ko")['translatedText']
     params = {"musicLyric":lyric}
     tag_list = requests.post(f"http://10.1.3.111:5000/music/tag/extraction",json=params).json()['tagList']
     tag_dict[music_id]=tag_list
