@@ -17,7 +17,7 @@ def get_tag_has_music_in_db(host,user,db,password):
 
 def get_music_tag_list(host,user,db,password):
     db = pymysql.connect(host=host,user=user,db=db,password=password,charset='utf8',client_flag=CLIENT.MULTI_STATEMENTS)
-    music_tag_list=[]
+    music_tag_list={}
     get_tag_id_sql = "select id from tag"
     get_music_id_by_tag_id_sql = "select music_id,tag_rank from tag_has_music where tag_id=%s"
     with db:
@@ -29,6 +29,6 @@ def get_music_tag_list(host,user,db,password):
                 cursor.execute(get_music_id_by_tag_id_sql,(tag_id))
                 music_id_list = [(music_id,rank) for music_id,rank in cursor.fetchall()]
 
-                music_tag_list.append({"tagId":tag_id,"musicIdList":music_id_list})
+                music_tag_list[tag_id] = music_id_list
 
     return music_tag_list
